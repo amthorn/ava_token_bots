@@ -38,6 +38,7 @@ class Bot:
             '^.*[dD][oO][gG]\s[pP][iI][cC].*$': self.dog_pic,
             '^.*[cC][aA][tT]\s[pP][iI][cC].*$': self.cat_pic,
             '^.*[sS][pP][oO][nN][gG][eE][bB][oO][bB].*$': self.spongebob,
+            '^.*#[sS][hH][rR][uU][gG][sS].*$': self.shrugs,
             # '^.*[rR][oO][nN]\s[sS][wW][aA][nN][sS][oO][nN].*$': self.ron,
             '^.*[mM][aA][gG][iI][cC]\s[eE][iI][gG][hH][tT](\s)?[bB][aA][lL][lL].*$': self.magic_eight_ball,
         }
@@ -173,3 +174,10 @@ class Bot:
 
         # Update quotes
         import spongebob_quote_getter
+
+
+    def shrugs(self, data, message):
+        self.api.messages.create(
+            markdown=preface + r'¯\\\_(ツ)\_/¯',
+            roomId=data['roomId']
+        )
