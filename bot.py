@@ -1,11 +1,19 @@
 import requests
 import re
+import urllib
+import os
 
 from ciscosparkapi import CiscoSparkAPI
+from config import PRODUCTION
 
-self_trigger_word = 'self'
+self_trigger_word = 'self' if PRODUCTION else 'dev'
 pirate_url = 'http://pirate.monkeyness.com/cgi-bin/translator.pl'
 pun_url = 'https://icanhazdadjoke.com/'
+cat_fact_url = 'https://catfact.ninja/fact'
+dog_pic_url = 'https://api.thedogapi.co.uk/v2/dog.php'
+cat_pic_url = 'http://thecatapi.com/api/images/get?format=src&type=gif'
+magic_eight_ball_url = 'https://yesno.wtf/api/'
+ron_swanson_url = 'https://ron-swanson-quotes.herokuapp.com/v2/quotes'
 
 approved_rooms = [
     'Y2lzY29zcGFyazovL3VzL1JPT00vYjA3NGRhMTAtZGViZS0xMWU3LWI5OGYtYTcwZDc1YjVjZGYw',   # QA MEME
@@ -22,46 +30,131 @@ class Bot:
     def __init__(self, api):
         self.api = api
         self.triggers = {
-            '^.*[pP][iI][rR][aA][tT][eE].*$': self.pirate_translate,
             '^.*[pP][uU][nN].*$': self.pun,
-            '^.*[cC][aA][tT]\s[fF][aA][cC][tT].*$': self.pun,
+            '^.*[pP][iI][rR][aA][tT][eE].*$': self.pirate_translate,
+            '^.*[cC][aA][tT]\s[fF][aA][cC][tT].*$': self.cat_fact,
+            '^.*[dD][oO][gG]\s[pP][iI][cC].*$': self.dog_pic,
+            '^.*[cC][aA][tT]\s[pP][iI][cC].*$': self.cat_pic,
+            # '^.*[rR][oO][nN]\s[sS][wW][aA][nN][sS][oO][nN].*$': self.ron,
+            '^.*[mM][aA][gG][iI][cC]\s[eE][iI][gG][hH][tT](\s)?[bB][aA][lL][lL].*$': self.magic_eight_ball,
         }
+        self.trigger_word_appears = False
 
     def handle(self, data):
         if self.api.people.me().id == data['personId']:
             # sent by me, check for first word is self
             message = self.api.messages.get(data['id']).text
-            accept_message =  message.strip().startswith(self_trigger_word)
-            if accept_message:
-                message = message.replace(self_trigger_word, '', 1)
+            if message:
+                accept_message =  message.strip().startswith(self_trigger_word)
+                if accept_message:
+                    message = message.replace(self_trigger_word, '', 1)
+                    self.trigger_word_appears = True
+            else:
+                accept_message = False
         else:
             message = self.api.messages.get(data['id']).text
             accept_message = True
 
-        if accept_message and ((dms and data.get('roomType') == 'direct') or data['roomId'] in approved_rooms):
-            message = message.replace(self.api.people.me().displayName, "", 1).strip()
+        if not PRODUCTION and self.trigger_word_appears or PRODUCTION:
+            if accept_message and ((dms and data.get('roomType') == 'direct') or data['roomId'] in approved_rooms):
+                message = message.replace(self.api.people.me().displayName, "", 1).strip()
 
-            if data['personId'] == blake:
-                self.api.messages.create(
-                    markdown=pun(data, message),
-                    roomId=data['roomId']
-                )
+                # if data['personId'] == blake:
+                #     self.api.messages.create(
+                #         markdown=pun(data, message),
+                #         roomId=data['roomId']
+                #     )
 
-            for regex, func in self.triggers.items():
-                if re.search(regex, message):
-                    self.api.messages.create(
-                        markdown=preface + func(data, message),
-                        roomId=data['roomId']
-                    )
-                    break
+                for regex, func in self.triggers.items():
+                    if re.search(regex, message):
+                        func(data, message)
+                        break
 
     def pirate_translate(self, data, message):
-        return requests.get(
+        message =  requests.get(
             pirate_url,
             params={
                 'english': message,
                 'version': 1.0
             }).text
 
+        self.api.messages.create(
+            markdown=preface + message,
+            roomId=data['roomId']
+        )
+
     def pun(self, data, message):
-        return requests.get(pun_url, headers={'Accept': 'application/json'}).json()['joke']
+        message = requests.get(pun_url, headers={'Accept': 'application/json'}).json()['joke']
+
+        self.api.messages.create(
+            markdown=preface + message,
+            roomId=data['roomId']
+        )
+
+    def cat_fact(self, data, message):
+        message = requests.get(cat_fact_url).json()['fact']
+
+        self.api.messages.create(
+            markdown=preface + message,
+            roomId=data['roomId']
+        )
+
+    def ron(self, data, message):
+        message = requests.get(ron_swanson_url).json()[0]
+
+        self.api.messages.create(
+            markdown=preface + message,
+            roomId=data['roomId']
+        )
+
+    def dog_pic(self, data, message):
+        response = requests.get(dog_pic_url)
+        if response.status_code == 200:
+            url = response.json()['data'][0]['url']
+            filename = 'dog_pic.' + response.json()['data'][0]['format']
+            with open(filename, 'wb') as file:
+                file.write(requests.get(url).content)
+
+            self.api.messages.create(
+                markdown=preface,
+                files=[filename],
+                roomId=data['roomId']
+            )
+            try:
+                os.remove(filename)
+            except OSError:
+                pass
+
+    def cat_pic(self, data, message):
+        response = requests.get(cat_pic_url)
+        if response.status_code == 200:
+            filename = 'cat_pic.gif'
+            with open(filename, 'wb') as file:
+                file.write(response.content)
+
+            self.api.messages.create(
+                markdown=preface,
+                files=[filename],
+                roomId=data['roomId']
+            )
+            try:
+                os.remove(filename)
+            except OSError:
+                pass
+
+    def magic_eight_ball(self, data, message):
+        response = requests.get(magic_eight_ball_url)
+        if response.status_code == 200:
+            filename = 'magic_eigh_ball.gif'
+            with open(filename, 'wb') as file:
+                file.write(requests.get(response.json()['image']).content)
+
+            self.api.messages.create(
+                markdown=preface + response.json()['answer'],
+                files=[filename],
+                roomId=data['roomId']
+            )
+            try:
+                os.remove(filename)
+            except OSError:
+                pass
