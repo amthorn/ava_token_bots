@@ -11,14 +11,15 @@ approved_rooms = [
     'Y2lzY29zcGFyazovL3VzL1JPT00vYjA3NGRhMTAtZGViZS0xMWU3LWI5OGYtYTcwZDc1YjVjZGYw',   # QA MEME
     'Y2lzY29zcGFyazovL3VzL1JPT00vNTA1MDY3YjAtMzM3Zi0xMWU4LThhYmEtMjE3NDEyMGI1ZjU0'  # TEST2
 ]
-dms = False
+dms = True
 
 class Bot:
     def __init__(self, api):
         self.api = api
         self.triggers = {
-            '^.*pirate.*$': self.pirate_translate,
-            '^.*pun.*$': self.pun
+            '^.*[pP][iI][rR][aA][tT][eE].*$': self.pirate_translate,
+            '^.*[pP][uU][nN].*$': self.pun,
+            '^.*[cC][aA][tT]\s[fF][aA][cC][tT].*$': self.pun,
         }
 
     def handle(self, data):

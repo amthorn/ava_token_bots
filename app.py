@@ -11,7 +11,6 @@ api = CiscoSparkAPI(AVA_BOT)
 
 @app.route('/', methods=['POST'])
 def index():
-    import pdb; pdb.set_trace()
     try:
         if hasattr(flask.request, 'json') and flask.request.json.get('data'):
             bot = Bot(api)
