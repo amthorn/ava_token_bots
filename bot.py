@@ -2,7 +2,6 @@ import requests
 import re
 
 from ciscosparkapi import CiscoSparkAPI
-from config import AVA_BOT
 
 self_trigger_word = 'self'
 pirate_url = 'http://pirate.monkeyness.com/cgi-bin/translator.pl'
@@ -15,15 +14,14 @@ approved_rooms = [
 dms = False
 
 class Bot:
-    def __init__(self):
-        self.api = CiscoSparkAPI(AVA_BOT)
+    def __init__(self, api):
+        self.api = api
         self.triggers = {
             '^.*pirate.*$': self.pirate_translate,
             '^.*pun.*$': self.pun
         }
 
     def handle(self, data):
-        import pdb; pdb.set_trace()
         if self.api.people.me().id == data['personId']:
             # sent by me, check for first word is self
             message = self.api.messages.get(data['id']).text

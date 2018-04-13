@@ -3,14 +3,17 @@ import traceback
 
 from flask import Flask
 from bot import Bot
+from config import AVA_BOT
 
 app = Flask(__name__)
+api = CiscoSparkAPI(AVA_BOT)
 
 @app.route('/', methods=['POST'])
 def index():
+    import pdb; pdb.set_trace()
     try:
         if hasattr(flask.request, 'json') and flask.request.json.get('data'):
-            bot = Bot()
+            bot = Bot(api)
             bot.handle(flask.request.json['data'])
 
     except Exception as e:
