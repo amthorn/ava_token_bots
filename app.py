@@ -1,4 +1,5 @@
 import flask
+import traceback
 
 from flask import Flask
 from bot import Bot
@@ -14,6 +15,7 @@ def index():
 
     except Exception as e:
         # text back error
+        print(traceback.format_exc())
         raise e
     return ''
 

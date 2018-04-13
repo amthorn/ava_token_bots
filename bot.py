@@ -23,6 +23,7 @@ class Bot:
         }
 
     def handle(self, data):
+        import pdb; pdb.set_trace()
         if self.api.people.me().id == data['personId']:
             # sent by me, check for first word is self
             message = self.api.messages.get(data['id']).text
