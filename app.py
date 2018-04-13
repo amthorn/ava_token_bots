@@ -4,6 +4,7 @@ import traceback
 from flask import Flask
 from bot import Bot
 from config import AVA_BOT
+from ciscosparkapi import CiscoSparkAPI
 
 app = Flask(__name__)
 api = CiscoSparkAPI(AVA_BOT)
