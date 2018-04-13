@@ -3,7 +3,7 @@ import traceback
 
 from flask import Flask
 from bot import Bot
-from config import AVA_BOT
+from config import AVA_BOT, PRODUCTION
 from ciscosparkapi import CiscoSparkAPI
 
 app = Flask(__name__)
@@ -19,7 +19,8 @@ def index():
     except Exception as e:
         # text back error
         print(traceback.format_exc())
-        raise e
+        if not PRODUCTION:
+            raise e
     return ''
 
 if __name__ == '__main__':
