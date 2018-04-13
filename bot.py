@@ -59,11 +59,11 @@ class Bot:
             if accept_message and ((dms and data.get('roomType') == 'direct') or data['roomId'] in approved_rooms):
                 message = message.replace(self.api.people.me().displayName, "", 1).strip()
 
-                # if data['personId'] == blake:
-                #     self.api.messages.create(
-                #         markdown=pun(data, message),
-                #         roomId=data['roomId']
-                #     )
+                if data['personId'] == blake:
+                    self.api.messages.create(
+                        markdown=pun(data, message),
+                        roomId=data['roomId']
+                    )
 
                 for regex, func in self.triggers.items():
                     if re.search(regex, message):
