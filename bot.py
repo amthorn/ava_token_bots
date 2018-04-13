@@ -2,6 +2,8 @@ import requests
 import re
 import urllib
 import os
+import json
+import random
 
 from ciscosparkapi import CiscoSparkAPI
 from config import PRODUCTION
@@ -35,6 +37,7 @@ class Bot:
             '^.*[cC][aA][tT]\s[fF][aA][cC][tT].*$': self.cat_fact,
             '^.*[dD][oO][gG]\s[pP][iI][cC].*$': self.dog_pic,
             '^.*[cC][aA][tT]\s[pP][iI][cC].*$': self.cat_pic,
+            '^.*[sS][pP][oO][nN][gG][eE][bB][oO][bB].*$': self.spongebob,
             # '^.*[rR][oO][nN]\s[sS][wW][aA][nN][sS][oO][nN].*$': self.ron,
             '^.*[mM][aA][gG][iI][cC]\s[eE][iI][gG][hH][tT](\s)?[bB][aA][lL][lL].*$': self.magic_eight_ball,
         }
@@ -158,3 +161,15 @@ class Bot:
                 os.remove(filename)
             except OSError:
                 pass
+
+    def spongebob(self, data, message):
+        try:
+            self.api.messages.create(
+                markdown=preface + random.choice(json.load(open('spongebob.json'))).replace('\n', '\n\n'),
+                roomId=data['roomId']
+            )
+        except FileNotFoundError:
+            pass
+
+        # Update quotes
+        import spongebob_quote_getter
