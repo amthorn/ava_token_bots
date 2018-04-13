@@ -30,6 +30,7 @@ class Bot:
             if accept_message:
                 message = message.replace(self_trigger_word, '', 1)
         else:
+            message = self.api.messages.get(data['id']).text
             accept_message = True
 
         if accept_message and ((dms and data.get('roomType') == 'direct') or data['roomId'] in approved_rooms):
