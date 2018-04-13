@@ -12,7 +12,10 @@ approved_rooms = [
     'Y2lzY29zcGFyazovL3VzL1JPT00vNTA1MDY3YjAtMzM3Zi0xMWU4LThhYmEtMjE3NDEyMGI1ZjU0',  # TEST2
     'Y2lzY29zcGFyazovL3VzL1JPT00vODQxYmJkMTAtZTI0NS0xMWU2LWE5YmUtNGQxN2YxMzBjNzJk',  # GENERAL
 ]
-preface = '[automated response] '
+
+blake = 'Y2lzY29zcGFyazovL3VzL1BFT1BMRS81MWYxMmUwOC0wYjRiLTQ3MzMtYmJjOC0zY2NiZjE3NWE0YTk'
+
+preface = ''
 dms = True
 
 class Bot:
@@ -37,6 +40,12 @@ class Bot:
 
         if accept_message and ((dms and data.get('roomType') == 'direct') or data['roomId'] in approved_rooms):
             message = message.replace(self.api.people.me().displayName, "", 1).strip()
+
+            if data['personId'] == blake:
+                self.api.messages.create(
+                    markdown=pun(data, message),
+                    roomId=data['roomId']
+                )
 
             for regex, func in self.triggers.items():
                 if re.search(regex, message):
