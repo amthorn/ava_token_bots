@@ -39,6 +39,7 @@ class Bot:
             '^.*[cC][aA][tT]\s[pP][iI][cC].*$': self.cat_pic,
             '^.*[sS][pP][oO][nN][gG][eE][bB][oO][bB].*$': self.spongebob,
             '^.*#[sS][hH][rR][uU][gG][sS].*$': self.shrugs,
+            '^.*#[rR][iI][pP].*$': self.rip,
             # '^.*[rR][oO][nN]\s[sS][wW][aA][nN][sS][oO][nN].*$': self.ron,
             '^.*[mM][aA][gG][iI][cC]\s[eE][iI][gG][hH][tT](\s)?[bB][aA][lL][lL].*$': self.magic_eight_ball,
         }
@@ -179,5 +180,11 @@ class Bot:
     def shrugs(self, data, message):
         self.api.messages.create(
             markdown=preface + r'¯\\\_(ツ)\_/¯',
+            roomId=data['roomId']
+        )
+
+    def rip(self, data, message):
+        self.api.messages.create(
+            files=['rip.png'],
             roomId=data['roomId']
         )
