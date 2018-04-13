@@ -65,10 +65,7 @@ class Bot:
                 message = message.replace(self.api.people.me().displayName, "", 1).strip()
 
                 if data['personId'] == blake:
-                    self.api.messages.create(
-                        markdown=pun(data, message),
-                        roomId=data['roomId']
-                    )
+                    pun(data, message)
 
                 for regex, func in self.triggers.items():
                     if re.search(regex, message):
@@ -150,7 +147,7 @@ class Bot:
     def magic_eight_ball(self, data, message):
         response = requests.get(magic_eight_ball_url)
         if response.status_code == 200:
-            filename = 'magic_eigh_ball.gif'
+            filename = 'magic_eight_ball.gif'
             with open(filename, 'wb') as file:
                 file.write(requests.get(response.json()['image']).content)
 
