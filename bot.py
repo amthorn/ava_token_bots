@@ -70,6 +70,8 @@ class Bot:
 
                 for regex, func in self.triggers.items():
                     if re.search(regex, message):
+                        while message.startswith(self_trigger_word):
+                            message = message.replace(self_trigger_word, "", 1).strip()
                         func(data, message)
                         break
 
@@ -192,7 +194,7 @@ class Bot:
 
         message_id = data['id']
         message = self.api.messages.get(message_id).text
-        message = re.sub("[vV][oO][tT][eE][bB][oO][tT]", "", message)
+        message = re.sub("[vV][oO][tT][eE][bB][oO][tT]", "", message).strip()
 
         if message.startswith("new vote"):
             options = [i.strip() for i in message.replace("new vote", "", 1).strip().split(' ')]
