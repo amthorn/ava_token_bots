@@ -64,14 +64,14 @@ class Bot:
         if not PRODUCTION and self.trigger_word_appears or PRODUCTION:
             if accept_message and ((dms and data.get('roomType') == 'direct') or data['roomId'] in approved_rooms):
                 message = message.replace(self.api.people.me().displayName, "", 1).strip()
-
+                import pdb; pdb.set_trace()
+                while message.startswith(self_trigger_word):
+                    message = message.replace(self_trigger_word, "", 1).strip()
                 # if data['personId'] == blake:
                 #     pun(data, message)
 
                 for regex, func in self.triggers.items():
                     if re.search(regex, message):
-                        while message.startswith(self_trigger_word):
-                            message = message.replace(self_trigger_word, "", 1).strip()
                         func(data, message)
                         break
 
