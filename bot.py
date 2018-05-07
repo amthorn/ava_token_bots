@@ -192,6 +192,7 @@ class Bot:
 
         message_id = data['id']
         message = self.api.messages.get(message_id).text
+        message = re.sub("[vV][oO][tT][eE][bB][oO][tT]", "", message)
 
         if message.startswith("new vote"):
             options = [i.strip() for i in message.replace("new vote", "", 1).strip().split(' ')]
