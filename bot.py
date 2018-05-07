@@ -190,7 +190,7 @@ class Bot:
     def vote_bot(self, data, message):
         me = self.api.people.me()
 
-        message_id = request['data']['id']
+        message_id = data['id']
         message = self.api.messages.get(message_id).text
 
         if message.startswith("new vote"):
@@ -201,22 +201,22 @@ class Bot:
 
             json.dump(votes, open('votes.json', 'w'))
             self.api.messages.create(
-                roomId=request['data']['roomId'],
+                roomId=data['roomId'],
                 markdown="Let the voting begin. Tag me with your case-sensitive vote!"
             )
         elif message == 'talley':
             votes = json.load(open('votes.json', 'r'))
-            self.api.messages.create(roomId=request['data']['roomId'], markdown=self.as_markdown(votes))
+            self.api.messages.create(roomId=data['roomId'], markdown=self.as_markdown(votes))
         else:
             votes = json.load(open('votes.json', 'r'))
             if message in votes:
-                votes[message].append(self.api.people.get(request['data']['personId']).displayName)
+                votes[message].append(self.api.people.get(data['personId']).displayName)
                 votes[message] = list(set(votes[message]))
                 json.dump(votes, open('votes.json', 'w'))
-                self.api.messages.create(roomId=request['data']['roomId'], markdown=self.as_markdown(votes))
+                self.api.messages.create(roomId=data['roomId'], markdown=self.as_markdown(votes))
             else:
                 self.api.messages.create(
-                    roomId=request['data']['roomId'],
+                    roomId=data['roomId'],
                     markdown="'" + str(message) + "' not a valid option, please use one of: " + ', '.join(list(votes.keys()))
                 )
 
