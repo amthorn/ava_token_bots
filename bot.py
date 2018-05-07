@@ -64,7 +64,7 @@ class Bot:
         if not PRODUCTION and self.trigger_word_appears or PRODUCTION:
             if accept_message and ((dms and data.get('roomType') == 'direct') or data['roomId'] in approved_rooms):
                 message = message.replace(self.api.people.me().displayName, "", 1).strip()
-                import pdb; pdb.set_trace()
+
                 while message.startswith(self_trigger_word):
                     message = message.replace(self_trigger_word, "", 1).strip()
                 # if data['personId'] == blake:
@@ -205,7 +205,7 @@ class Bot:
             json.dump(votes, open('votes.json', 'w'))
             self.api.messages.create(
                 roomId=data['roomId'],
-                markdown="Let the voting begin. Tag me with your case-sensitive vote!"
+                markdown="Let the voting begin. To vote, say 'votebot X' where X is your case-sensitive vote!"
             )
         elif message == 'talley':
             votes = json.load(open('votes.json', 'r'))
