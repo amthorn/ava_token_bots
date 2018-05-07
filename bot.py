@@ -193,7 +193,6 @@ class Bot:
         me = self.api.people.me()
 
         message_id = data['id']
-        message = self.api.messages.get(message_id).text
         message = re.sub("[vV][oO][tT][eE][bB][oO][tT]", "", message).strip()
 
         if message.startswith("new vote"):
